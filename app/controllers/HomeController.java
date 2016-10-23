@@ -46,11 +46,19 @@ public class HomeController extends Controller {
             connectionRequestJson.put("id", connectionRequest.id);
             return (connectionRequestJson);
         }).collect(Collectors.toList())));
-        User.find.all().stream()
+
+        data.set("suggestions", objectMapper.valueToTree(User.find.all().stream()
                 .filter(x->!user.equals(x))
                 .filter(x->!user.connections.contains(x))
                 .filter(x->!user.ConnectionRequestReceived.stream().map(y->y.sender).collect(Collectors.toList()).contains(x))
-                .filter(x->!user.ConnectionRequestSent.stream().map(y->y.receiver).collect(Collectors.toList()).contains(x));
+                .filter(x->!user.ConnectionRequestSent.stream().map(y->y.receiver).collect(Collectors.toList()).contains(x))
+                .map(x->{
+                    ObjectNode userJson = objectMapper.createObjectNode();
+                    Profile suggestionProfile = Profile.find.byId(x.profile.id);
+                    userJson.put("firstname", suggestionProfile.firstname);
+                    userJson.put("id", x.id);
+                    return (userJson);
+                }).collect(Collectors.toList())));
         return ok(data);
     }
 
