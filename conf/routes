@@ -4,8 +4,9 @@
 POST    /login                                controllers.Application.login()
 POST    /signup                               controllers.Application.signup()
 
-POST    /request/send/:senderid/:receiverid   controllers.ConnectionController.sendConnectionRequest(senderId:Long,receiverId: Long)
-POST    /request/accept/:id                   controllers.ConnectionController.acceptConnectionRequest(requestId: Long)
+POST    /request/send/:senderId/:receiverId   controllers.RequestController.sendRequest(senderId:Long,receiverId: Long)
+POST    /request/accept/:id                   controllers.RequestController.acceptRequest(id: Long)
+
 GET     /profile/:id                          controllers.HomeController.getProfile(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path

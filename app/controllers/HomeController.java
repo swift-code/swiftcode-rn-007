@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class HomeController extends Controller {
     @Inject
     ObjectMapper objectMapper;
-    public Result getprofile(Long Id){
+    public Result getProfile(Long Id){
         User user = User.find.byId(Id);
         Profile profile = user.profile.find.byId(Id);
         ObjectNode data = objectMapper.createObjectNode();
