@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import models.ConnectionRequest;
 import models.Profile;
 import models.User;
 import play.mvc.Controller;
@@ -24,6 +25,7 @@ public class HomeController extends Controller {
         data.put("lastname",profile.lasttname);
         data.put("id",user.id);
         data.put("email",user.email);
+
         data.set("connections", objectMapper.valueToTree(user.connections.stream().map(connection->{
             ObjectNode connectionJson = objectMapper.createObjectNode();
             User connectionUser = User.find.byId(connection.id);
@@ -37,10 +39,18 @@ public class HomeController extends Controller {
             return (connectionJson);
         }).collect(Collectors.toList())));
 
-
-
-
-
+        data.set("connectionRequests", objectMapper.valueToTree(user.ConnectionRequestReceived.stream().filter(x->x.status.equals(ConnectionRequest.Status.WAITING)).map(connectionRequest->{
+            ObjectNode connectionRequestJson = objectMapper.createObjectNode();
+            Profile connectionRequestProfile = Profile.find.byId(connectionRequest.sender.profile.id);
+            connectionRequestJson.put("firstname", connectionRequestProfile.firstname);
+            connectionRequestJson.put("id", connectionRequest.id);
+            return (connectionRequestJson);
+        }).collect(Collectors.toList())));
+        User.find.all().stream()
+                .filter(x->!user.equals(x))
+                .filter(x->!user.connections.contains(x))
+                .filter(x->!user.ConnectionRequestReceived.stream().map(y->y.sender).collect(Collectors.toList()).contains(x))
+                .filter(x->!user.ConnectionRequestSent.stream().map(y->y.receiver).collect(Collectors.toList()).contains(x));
         return ok(data);
     }
 
